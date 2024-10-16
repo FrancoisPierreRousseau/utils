@@ -2,7 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
+
+// dir doit être un tableau de path
+
 const readdirAsync = util.promisify(fs.readdir)
+
 
 async function findFilesName(dir){
     if(typeof dir !== 'string'){
@@ -71,29 +75,30 @@ async function findFilesRecursiveByExtension(dir, extension) {
     return (await findFilesRecusive(dir)).filter(filePath => path.extname(filePath) === extension);
 }
 
-// ( async () => {
-//       console.log(await findFilesRecursiveByExtension('./', '.png'))
-// })()
-
-
-
-
-
-// Nom du fichier à supprimer (exemple : 'xxx.png')
-// const fileNameToDelete = 'xxx.png';
-
-// Fonction pour supprimer un fichier
 function deleteFile(filePath) {
+    if(typeof filePath !== 'string'){
+        throw new Error('filePath doit de type string')
+    }
+
     if (fs.existsSync(filePath)) {
         fs.unlink(filePath, (err) => {
             if (err) {
-                console.error(`Erreur lors de la suppression du fichier ${filePath}:`, err);
+                throw new Error(`Erreur lors de la suppression du fichier ${filePath}: ${err}`)
             } else {
-                console.log(`Fichier supprimé: ${filePath}`);
+                return filePath
             }
         });
     }
 }
+
+// retourner le filePath
+console.log(deleteFile('images.jpg')
+
+
+
+
+
+
 
 // Fonction pour parcourir récursivement un répertoire et ses sous-dossiers
 function traverseDirectory(directory) {
