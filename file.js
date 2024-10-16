@@ -80,6 +80,7 @@ function deleteFile(filePath) {
         throw new Error('filePath doit de type string')
     }
 
+    // Rend unlink en promesse
     if (fs.existsSync(filePath)) {
         fs.unlink(filePath, (err) => {
             if (err) {
