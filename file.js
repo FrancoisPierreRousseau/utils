@@ -92,7 +92,7 @@ function deleteFile(filePath) {
 }
 
 // retourner le filePath
-console.log(deleteFile('images.jpg')
+console.log(deleteFile('images.jpg'))
 
 
 
