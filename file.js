@@ -6,61 +6,50 @@ const util = require('util');
 // dir doit être un tableau de path
 
 const readdirAsync = util.promisify(fs.readdir)
+const unlinkAsync = util.promisify(fs.unlink)
 
-
-async function findFilesName(dir){
+// Si il ne trouve pas le dir générer une erreur
+async function findFilesName(dir, { recursive = false  }){
     if(typeof dir !== 'string'){
         throw new Error('Dir doit être de type string')
+    }
+
+    if(!fs.existsSync(dir)){
+        throw new Error(`Le chemin spécifié n'existe pas : ${path.resolve(dir)}`);
+    }
+
+    if (!fs.statSync(dir).isDirectory()) {
+        throw new Error(`Le chemin spécifié n'est pas un répertoire valide : ${path.resolve(dir)}`);
     }
     
-    return (await readdirAsync(dir)).filter(file => !fs.statSync(path.join(dir, file)).isDirectory())
+    return (await readdirAsync(dir, { recursive })).filter(file => !fs.statSync(path.join(dir, file)).isDirectory())
 }
 
 // ( async () => {
-//     console.log(await findFilesName('./'))
+//     console.log(await findFilesName('./', { recursive: false }))
 // })()
 
 
-
-async function findSubDirectories(dir){
+// Si il ne trouve pas le dir générer une erreur
+async function findSubDirectories(dir, { recursive = false }){
     if(typeof dir !== 'string'){
         throw new Error('Dir doit être de type string')
     }
 
-    return (await readdirAsync(dir)).map(file => path.join(dir, file)).filter(filePath => fs.statSync(filePath).isDirectory())
+    if(!fs.existsSync(dir)){
+        throw new Error(`Le chemin spécifié n'existe pas : ${path.resolve(dir)}`);
+    }
+
+    if (!fs.statSync(dir).isDirectory()) {
+        throw new Error(`Le chemin spécifié n'est pas un répertoire valide : ${path.resolve(dir)}`);
+    }
+
+    return (await readdirAsync(dir, { recursive })).map(file => path.join(dir, file)).filter(filePath => fs.statSync(filePath).isDirectory())
 }
 
 // ( async () => {
-//      console.log(await findSubDirectories('./'))
+//     console.log((await findSubDirectories('./', { recursive: true })).filter(dir => dir.split('\\').at(0) !== '.git'))
 // })()
-
-async function findSubDirectoriesRecursive(dir){
-
-    if(typeof dir !== 'string'){
-        throw new Error('dir doit être de type string')
-    }
-
-    return (await readdirAsync('./', { recursive: true })).map(file => path.join(dir, file)).filter(filePath => fs.statSync(filePath).isDirectory())
-}
-
-// ( async () => {
-//       console.log(await findSubDirectoriesRecursive('./'))
-// })()
-
-
-async function findFilesRecusive(dir){
-
-    if(typeof dir !== 'string'){
-        throw new Error('dir doit de type string')
-    }
-
-    return (await readdirAsync(dir, {recursive: true})).filter(file => !fs.statSync(path.join(dir, file)).isDirectory())
-}
-
- // ( async () => {
- //       console.log(await findFilesRecusive('./'))
- // })()
-
 
 
 async function findFilesRecursiveByExtension(dir, extension) {
@@ -72,71 +61,70 @@ async function findFilesRecursiveByExtension(dir, extension) {
         throw new Error('extension doit de type string')
     }
 
-    return (await findFilesRecusive(dir)).filter(filePath => path.extname(filePath) === extension);
+    if(!fs.existsSync(dir)){
+        throw new Error(`Le chemin spécifié n'existe pas : ${path.resolve(dir)}`);
+    }
+
+    if (!fs.statSync(dir).isDirectory()) {
+        throw new Error(`Le chemin spécifié n'est pas un répertoire valide : ${path.resolve(dir)}`);
+    }
+
+    return (await findFilesName(dir, { recursive: true })).filter(filePath => path.extname(filePath) === extension);
 }
 
-function deleteFile(filePath) {
+// ( async () => {
+//        console.log(await findFilesRecursiveByExtension('./', '.png'))
+// })()
+
+async function deleteFile(filePath) {
     if(typeof filePath !== 'string'){
         throw new Error('filePath doit de type string')
     }
 
-    // Rend unlink en promesse
-    if (fs.existsSync(filePath)) {
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                throw new Error(`Erreur lors de la suppression du fichier ${filePath}: ${err}`)
-            } else {
-                return filePath
-            }
-        });
+    if(!fs.existsSync(filePath)){
+        throw new Error(`Le chemin spécifié n'existe pas : ${path.resolve(filePath)}`);
     }
+
+    try{
+        await unlinkAsync(filePath)
+    } catch(err){
+        throw new Error(`Erreur lors de la suppression du fichier ${filePath}: ${err}`)
+    }
+    
+    return filePath
 }
 
-// retourner le filePath
-console.log(deleteFile('images.jpg'))
+// (async () => {
+//    await deleteFile('apiAsp.jpg')
+// })()
 
 
 
+async function deleteFileInAllSubdictories(dir, fileName) {
+    if(typeof fileName !== 'string'){
+        throw new Error('fileName doit de type string')
+    }
 
+    if(typeof dir !== 'string'){
+        throw new Error('fileName doit de type string')
+    }
 
+    if(!fs.existsSync(dir)){
+        throw new Error(`Le chemin spécifié n'existe pas : ${path.resolve(dir)}`);
+    }
 
+    if (!fs.statSync(dir).isDirectory()) {
+        throw new Error(`Le chemin spécifié n'est pas un répertoire valide : ${path.resolve(dir)}`);
+    }
 
-// Fonction pour parcourir récursivement un répertoire et ses sous-dossiers
-function traverseDirectory(directory) {
-    // Lire le contenu du répertoire
-    fs.readdir(directory, (err, files) => {
-        if (err) {
-            console.error(`Erreur lors de la lecture du dossier ${directory}:`, err);
-            return;
-        }
+    const subDirectories = await findSubDirectories(dir, { recursive: true })
 
-        // Parcourir chaque fichier/dossier dans le répertoire
-        files.forEach(file => {
-            const filePath = path.join(directory, file);
-
-            // Vérifie si c'est un répertoire
-            fs.stat(filePath, (err, stat) => {
-                if (err) {
-                    console.error(`Erreur lors de la vérification du fichier ${filePath}:`, err);
-                    return;
-                }
-
-                // Si c'est un dossier, on appelle récursivement traverseDirectory
-                if (stat.isDirectory()) {
-                    traverseDirectory(filePath); // Appel récursif
-                } else {
-                    // Si c'est un fichier et qu'il correspond au nom à supprimer
-                    if (file === fileNameToDelete) {
-                        deleteFile(filePath); // Supprimer le fichier
-                    }
-                }
-            });
-        });
-    });
+    const filesPath = subDirectories.map(subDir => path.join(subDir, fileName))
+    const filesPathToDelete = [path.join(dir, fileName), ...filesPath].filter(filePath => fs.existsSync(filePath))
+    
+    return await Promise.all(filesPathToDelete.map(filepath => deleteFile(filepath)))
 }
 
-// Répertoire racine où commencer la recherche (remplace-le par le chemin de ton dossier)
-// const rootDirectory = path.resolve(__dirname, 'ton_dossier');
-
-// Lancer la recherche récursive et suppression des fichiers correspondants
-// traverseDirectory(rootDirectory);
+// (async () => {
+//      console.log(await deleteFileInAllSubdictories('./','5-Anime-Like-The-Samurai-Champloo-You-Must-See-FHVIY-1.jpg'))
+// })()
