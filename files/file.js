@@ -11,7 +11,7 @@ const unlinkAsync = util.promisify(fs.unlink)
 // Si il ne trouve pas le dir générer une erreur
 async function findFilesName(dir, { recursive = false  }){
     if(typeof dir !== 'string'){
-        throw new Error('Dir doit être de type string')
+        throw new Error('dir doit être de type string')
     }
 
     if(!fs.existsSync(dir)){
@@ -99,6 +99,10 @@ async function deleteFile(filePath) {
 // })()
 
 
+const files = {
+    "dir": [ 'file1', 'file2' ],
+    "dir2": [ 'file1', 'file2' ]
+}
 
 async function deleteFileInAllSubdictories(dir, fileName) {
     if(typeof fileName !== 'string'){
@@ -116,7 +120,7 @@ async function deleteFileInAllSubdictories(dir, fileName) {
     if (!fs.statSync(dir).isDirectory()) {
         throw new Error(`Le chemin spécifié n'est pas un répertoire valide : ${path.resolve(dir)}`);
     }
-
+    // Ici il est plus valable  de directement utiliser le findFile et non subdirectories
     const subDirectories = await findSubDirectories(dir, { recursive: true })
 
     const filesPath = subDirectories.map(subDir => path.join(subDir, fileName))
