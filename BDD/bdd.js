@@ -98,7 +98,7 @@ const spawnExecuteQuery =  query => {
         '-ExecutionPolicy', 
         'Bypass', 
         '-File', 
-        './shells/test.ps1',
+        './shells/executeQuery.ps1',
         '-SERVEUR',
         'LAPTOP-OPT2NCJT',
         '-DATABASE',
@@ -135,4 +135,13 @@ const spawnExecuteQuery =  query => {
 })()
 
 
-// Instalation VSCode (prettier)
+// Instalation VSCode (avec extensions, autosave, autoformate...), discord, Visual Studio Community
+// Avec une commande Installer
+// Ce serais bien que je puisse save les configuration que j'apprécie pour les utiliser
+// sur un autre poste
+// Ce serais bien si je pouvais réutiliser des configuration ou le logi est déja présente
+// Ce serait bien de snapshot pour revenir en arriére au cas où
+
+// Création de fichiers de configuration
+// Synchronisation fichiers
+// Triage et nettoyage mails
