@@ -8,7 +8,6 @@ const util = require('util');
 const readdirAsync = util.promisify(fs.readdir)
 const unlinkAsync = util.promisify(fs.unlink)
 
-// Si il ne trouve pas le dir générer une erreur
 async function findFilesName(dir, { recursive = false  }){
     if(typeof dir !== 'string'){
         throw new Error('dir doit être de type string')
@@ -30,7 +29,6 @@ async function findFilesName(dir, { recursive = false  }){
 // })()
 
 
-// Si il ne trouve pas le dir générer une erreur
 async function findSubDirectories(dir, { recursive = false }){
     if(typeof dir !== 'string'){
         throw new Error('Dir doit être de type string')
@@ -120,15 +118,15 @@ async function deleteFileInAllSubdictories(dir, fileName) {
     if (!fs.statSync(dir).isDirectory()) {
         throw new Error(`Le chemin spécifié n'est pas un répertoire valide : ${path.resolve(dir)}`);
     }
-    // Ici il est plus valable  de directement utiliser le findFile et non subdirectories
-    const subDirectories = await findSubDirectories(dir, { recursive: true })
 
-    const filesPath = subDirectories.map(subDir => path.join(subDir, fileName))
+    // Existe un undefined le supprimer
+    const filesPath = (await findFilesName(dir, { recursive: true })).filter(filePath => path.basename(filePath) === fileName)
+
     const filesPathToDelete = [path.join(dir, fileName), ...filesPath].filter(filePath => fs.existsSync(filePath))
     
     return await Promise.all(filesPathToDelete.map(filepath => deleteFile(filepath)))
 }
 
-// (async () => {
-//      console.log(await deleteFileInAllSubdictories('./','5-Anime-Like-The-Samurai-Champloo-You-Must-See-FHVIY-1.jpg'))
-// })()
+(async () => {
+     console.log(await deleteFileInAllSubdictories('./','safe.png'))
+})()
