@@ -18,10 +18,18 @@
 #
 ######################################################
 
-# Installater : 
-#     Dev: IDE:
+# Installater : (doit avoir la capaciter de choisir ce que l'on veut installer) 
+#     Dev: PowerShell: 
+#             - Version minimum pour fonctionner
+#             - Activer globalement Set-StrictMode  
+#          IDE:
 #             vscommunity: Install-Module -Name VSSetup -Scope CurrentUser
-#             vscode (extension pretier-> utilise package prettiers)
+#             vscode:
+#                 extension:
+#                         pretier-> utilise package prettiers)
+#                         shellcheck
+#                         shellformat
+#                         PowerShell
 #          Outils : 
 #             volta (installer directement node via volta)
 #          Packages: 
