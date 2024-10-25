@@ -3,12 +3,19 @@
 
 ##########################################################################
 #
-# Puis ce module Installer serra ce qui est spécifique à moi, le reste pourra 
+# Ce module Installer serra ce qui est spécifique à moi, le reste pourra 
 # être utiliser de façon totalement indépendante  
 #
 ##########################################################################
 
 
+##########################################################################
+#     PRES REQUIS GLOBAL
+# Dev: PowerShell: 
+#      - Version minimum pour fonctionner
+#      - Activer globalement Set-StrictMode  
+#
+##########################################################################
 
 
 ######################################################
@@ -17,18 +24,18 @@
 # Prérequie: .... 
 #
 ######################################################
-
 # Installater : (doit avoir la capaciter de choisir ce que l'on veut installer) 
-#     Dev: PowerShell: 
-#             - Version minimum pour fonctionner
-#             - Activer globalement Set-StrictMode  
 #          IDE:
 #             vscommunity: Install-Module -Name VSSetup -Scope CurrentUser
 #             vscode:
 #                 extension:
-#                         pretier-> utilise package prettiers)
+#                         Prettier - Code formatter > utilise package prettiers)
 #                         shellcheck
 #                         shellformat
+#                         PowerShell
+#                         Material Icon Theme
+#                         Material Theme — Free
+#                         Night Owl
 #                         PowerShell
 #          Outils : 
 #             volta (installer directement node via volta)
@@ -59,6 +66,7 @@
 #                /Séries TV:Par série/Par saison
 #                /Vidéos personnelles: Par année,Par événement
 #        C:temp/ (centralise les dossiers à supprimer avec une tache planifier qui passe tout les X temps pour le vider)
+#                (temps que le dossier est présent, conservation des anciennes configuration pour backup)
 
 # Synchronisation
 # Dans le dossier vidéos, à chaque fois que j'y placerais un fichier .torrent, il serra consommé par l'API Alldebrid, telechargera le contenu qui serra placé au bon endroit 
@@ -74,11 +82,30 @@
 # sinon offrir la possibilité de changer la structure 
 # Gérer fichiers dossiers: New-Item, Remove-Item, Copy-Item, Move-Item
 
+
 # Initialize-Workspace
 
 # Workspace -List 
 
+################################################################################
+# Permet de pouvoir automatiquement maper les dossiers en theme et sous sous theme
+#
+#
+##################################################################################
+
+################## 
+# Un thémes doit être unique dans son théme racine. Cela crée le repertoire en même temps
 # Set-WorkspacePath -Theme "Documents" -Path "D:\Users\Francois" -> D:\Users\Francois\Documents
+#                   -RootTheme "Documents" -Theme "Dossiers pro" -> D:\Users\Francois\Documents\Dossiers pro
+##################
+
+#############################################################
+# Repertorie le path avec tout les sous theme et sous sous theme du theme avec les paths
+# Get-WorkspaceInfo -Theme "Documents" 
+#
+#############################################################
+
+# Open-Workspace -Theme "Documents"
 
 # Copy-WorkspaceContent -SourceTheme  "Documents" -SourceName "Dossier/Sous Dossier" -DestinationTheme "Videos" -DestinationName="Dossier/Sous Dossier"
 # Copy-WorkspaceContent -SourceTheme  "Documents" -DestinationTheme "Videos"
@@ -86,18 +113,17 @@
 # Copy-WorkspaceContent -SourceTheme  "Documents" -Name "Dossier/Sous Dossier" 
 # Copy-WorkspaceContent -SourcePath "E:/backup"   -DestinationName  "Documents" -Name "Dossier/Sous Dossier"
 
-
 # Get-WorkspaceContent -Theme "Documents" -Name "Dossier/Sous Dossier"
 # Get-WorkspaceContent -Theme "Documents" 
 
 
+# New-WorkspaceItem -Theme "Documents"  -Name "Nouveau Dossier" -IsTheme (ne dois pas fonctionner pour 'Nouveau Dossier/Sous Dossier')
 # New-WorkspaceItem -Theme "Documents"  -Name "Nouveau Dossier/Sous Dossier" -IsFolder
 # New-WorkspaceItem -Theme "Documents"  -Name "Nouveau Dossier/doc.csv" -IsFile
 
 # Remove-WorkspaceItem -Theme "Documents"  -Name "Dossier/Sous Dossier/fichier.txt"  
 
 # Move-WorkspaceItem -SourceTheme = "Document" -Name "Dossier/Sous Dossier" -DestinationTheme "Videos"
-
 
 # Invoke-WorkspaceCleanup
 

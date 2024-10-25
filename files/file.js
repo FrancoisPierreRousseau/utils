@@ -2,10 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
-//
+//  https://clearpurpose.media/book-brief-playing-to-win-e78f7f5f7142
 //  Chaque shéma dans une bdd correspond à un domaine (gestion des callendrier, des dossiers, des droits utilisateurs)
 //  Connecter une API(s) à chaque schéma ce qui permet d'avoir une gestion plus fine au niveau des droits applicatiifs
 //  Lorsqu'un schéma est modifier alors les autres shéma peuvent réagir en conséquence ?   
+
 
 
 const readdirAsync = util.promisify(fs.readdir)
@@ -37,13 +38,49 @@ async function findFilesName(directories, { recursive = false  }){
     }
 
 
-    const filtreByFilename = async directory => (await readdirAsync(directory, { recursive })).filter(file => !fs.statSync(path.join(directories, file)).isDirectory())
-    return directories.map(async directory => await filtreByFilename(directory) )
+    const filtreByFile = async directory => (await readdirAsync(directory, { recursive })).filter(file => !fs.statSync(path.join(directory, file)).isDirectory())
+    return await Promise.all(directories.map(directory => filtreByFile(directory) ))
 }
 
 ( async () => {
-    console.log(await findFilesName(['./', './mem/citation-jacques-chirac-8635.png'] ,{ recursive: false }))
+
+    // ------ Recursion terminal ----------------------
+   const directories = [
+        './../../', 
+        './mem', 
+        '../../../../', 
+        'C:\\Users\\franc\\Videos\\films\\..'
+    ].map(dir => path.resolve(dir))
+    
+    const lastPaths = directories
+            .filter((currentDir) => directories.every(
+                dir => currentDir === dir ? true :  !dir.includes(currentDir) 
+            ))
+
+    const potentialParentPath = directories.filter(currentDir => 
+        !(lastPaths.some(lastPath => currentDir === lastPath)))
+
+    const sureParentPath = lastPaths.filter(
+        lastPath => potentialParentPath.some(dir => !(lastPath.includes(dir))))
+
+    console.log(sureParentPath)
+    console.log(potentialParentPath)
+    
+    //----------------------------------------------------------------------------
+
+
+
+
+    
+
+    directories.map(dir => path.resolve(dir)).sort((a, b) => a.length - b.length).reduce((array, dir) => {
+        return array
+    },[])
+   
+    //console.log(directories)
+   // console.log(await findFilesName(['./'] ,{ recursive: false }))
 })()
+
 
 
 async function findSubDirectories(dir, { recursive = false }){
